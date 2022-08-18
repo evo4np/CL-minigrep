@@ -19,8 +19,11 @@ struct Config {
 
 impl Config {
     fn new(args: &[String]) -> Config {
+        if args.len() < 3 {
+            panic!("not enough arguments");
+        }
         let query = args[1].clone(); // makes full copy of the data fo the config instance to own
-    let file_path = args[2].clone();
+        let file_path = args[2].clone();
 
     Config {query, file_path}
     }
