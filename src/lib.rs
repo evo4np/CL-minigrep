@@ -1,15 +1,22 @@
-use std::fs;
+use std::{env,fs};
 use std::error::Error;
 
 pub struct Config {
     pub query: String,
     pub file_path: String,
+    pub ignore_case: bool,
 }
 
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.file_path)?;
 
-    for line in search(&config.query, &contents) {
+    let results = if config.ignore_case {
+        search_case_insensitive(&config.query, &contents)
+    } else {
+        search(&config.query, &contents)
+    };
+
+    for line in results {
         print!("{line}");
     }
     Ok(())
@@ -24,7 +31,9 @@ impl Config {
         let query = args[1].clone(); // makes full copy of the data fo the config instance to own
         let file_path = args[2].clone();
 
-        Ok(Config {query, file_path})
+        let ignore_case = env::var("IGNORE_CASE").is_ok();
+
+        Ok(Config {query, file_path, ignore_case,})
     }
 }
 
