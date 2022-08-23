@@ -9,7 +9,11 @@ pub struct Config {
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.file_path)?;
 
+    for line in search(&config.query, &contents) {
+        print!("{line}");
+    }
     Ok(())
+
 }
 
 impl Config {
@@ -32,15 +36,21 @@ mod tests {
     fn one_result() {
         let query = "duct";
         let contents = "\
-        Rust:
-        safe, fast, productive.
-        pick three.";
+Rust:
+safe, fast, productive.
+pick three.";
 
-        assert_eq!(vec!["safe, fast, productive"], search(query, contents));
+        assert_eq!(vec!["safe, fast, productive."], search(query, contents));
     }
 }
 
 pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str>{
-    vec![]
+    let mut results = Vec::new();
+    for line in contents.lines() {
+        if line.contains(query) {
+            results.push(line); // storing the lines that match so we can return them
+        }
+    }
+    results
 
 }
